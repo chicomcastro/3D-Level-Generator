@@ -10,11 +10,7 @@ namespace LevelGenerator
         SerializedProperty colorMappings;
         SerializedProperty dimension;
         SerializedProperty floorPrefab;
-        SerializedProperty trees;
-        SerializedProperty flower;
-        SerializedProperty rock;
-        SerializedProperty stone;
-        SerializedProperty others;
+        SerializedProperty objectsToSpawn;
 
         void OnEnable()
         {
@@ -22,11 +18,7 @@ namespace LevelGenerator
             colorMappings = serializedObject.FindProperty("colorMappings");
             dimension = serializedObject.FindProperty("dimension");
             floorPrefab = serializedObject.FindProperty("floorPrefab");
-            trees = serializedObject.FindProperty("trees");
-            flower = serializedObject.FindProperty("flower");
-            rock = serializedObject.FindProperty("rock");
-            stone = serializedObject.FindProperty("stone");
-            others = serializedObject.FindProperty("otherScenariosObject");
+            objectsToSpawn = serializedObject.FindProperty("objectsToSpawn");
         }
 
 
@@ -63,7 +55,7 @@ namespace LevelGenerator
                     myScript.DeleteFloor();
                 }
                 GUILayout.EndHorizontal();
-                
+
                 GUILayout.Space(10);
                 EditorGUILayout.LabelField("Floor Reference Size", myScript.instantiatedFloor.Count.ToString());
                 if (GUILayout.Button("Search for floor"))
@@ -74,31 +66,10 @@ namespace LevelGenerator
                 GUILayout.Space(10);
                 EditorGUILayout.LabelField("Static generation", EditorStyles.boldLabel);
 
-                myScript.treeNameForResearch = EditorGUILayout.TextField("Tree research word", myScript.treeNameForResearch);
-                myScript.treeProb = EditorGUILayout.FloatField("Probability", myScript.treeProb);
-                EditorGUILayout.PropertyField(trees, true);
+                EditorGUILayout.PropertyField(objectsToSpawn, true);
 
-                GUILayout.Space(10);
-                myScript.flowerNameForResearch = EditorGUILayout.TextField("Flower research word", myScript.flowerNameForResearch);
-                myScript.flowerProb = EditorGUILayout.FloatField("Probability", myScript.flowerProb);
-                EditorGUILayout.PropertyField(flower, true);
-
-                GUILayout.Space(10);
-                myScript.rockNameForResearch = EditorGUILayout.TextField("Rock research word", myScript.rockNameForResearch);
-                myScript.rockProb = EditorGUILayout.FloatField("Probability", myScript.rockProb);
-                EditorGUILayout.PropertyField(rock, true);
-
-                GUILayout.Space(10);
-                myScript.stoneNameForResearch = EditorGUILayout.TextField("Stone research word", myScript.stoneNameForResearch);
-                myScript.stoneProb = EditorGUILayout.FloatField("Probability", myScript.stoneProb);
-                EditorGUILayout.PropertyField(stone, true);
-
-                GUILayout.Space(10);
-                myScript.otherProb = EditorGUILayout.FloatField("Probability", myScript.otherProb);
-                EditorGUILayout.PropertyField(others, true);
-                
                 GUILayout.BeginHorizontal();
-                if (GUILayout.Button("Find scenario's objects"))
+                if (GUILayout.Button("Find scenario's objects by name"))
                 {
                     myScript.LookForGameObjects();
                 }

@@ -9,7 +9,7 @@ public class AssetExposer : MonoBehaviour
     public GameObject[] objectsToExpose;
 
     public float expositionLenght = 20f;
-    public float high = 0f;
+    public float altitude = 0f;
     public float pace = 5f;
 
     public bool shouldDeletePrevious = true;
@@ -26,7 +26,7 @@ public class AssetExposer : MonoBehaviour
 
     public void ShowObjects()
     {
-        float _y = high, _x = 0, _z = 0;
+        float _y = altitude, _x = 0, _z = 0;
 
         GameObject assets = new GameObject();
         assets.name = "Exposition";

@@ -12,6 +12,15 @@ namespace LevelGenerator
         ThreeD,
     };
 
+    [Serializable]
+    public class ScenarioStaticObject
+    {
+        public string name;
+        public GameObject[] objects;
+        public float probability = 0.2f;
+        public float dispersionRadius = 5.0f;
+    }
+
     [ExecuteInEditMode]
     public class LevelGenerator : MonoBehaviour
     {
@@ -29,26 +38,8 @@ namespace LevelGenerator
         private List<GameObject> instantiatedLevel = new List<GameObject>();
         public List<GameObject> instantiatedFloor = new List<GameObject>();
 
-        public GameObject[] trees;
-        public string treeNameForResearch = "tree";
-        public float treeProb = 0.2f;
-
-        public GameObject[] flower;
-        public string flowerNameForResearch = "flower";
-        public float flowerProb = 0.2f;
-
-        public GameObject[] rock;
-        public string rockNameForResearch = "rock";
-        public float rockProb = 0.2f;
-
-        public GameObject[] stone;
-        public string stoneNameForResearch = "stone";
-        public float stoneProb = 0.2f;
-
-        public GameObject[] otherScenariosObject;
-        public float otherProb = 0.2f;
-
-        public float dispersionRadius = 5.0f;
+        [SerializeField]
+        public ScenarioStaticObject[] objectsToSpawn;
 
         // 3D setting
         public Vector2 boardSize = new Vector2(10, 10);
@@ -171,49 +162,20 @@ namespace LevelGenerator
 
         public void LookForGameObjects()
         {
-            List<GameObject> found = new List<GameObject>();
-            foreach (GameObject gamo in GetComponent<AssetExposer>().objectsToExpose)
+            foreach (ScenarioStaticObject _o in objectsToSpawn)
             {
-                if (gamo.name.ToLower().Contains(treeNameForResearch))
+                List<GameObject> found = new List<GameObject>();
+
+                foreach (GameObject gamo in GetComponent<AssetExposer>().objectsToExpose)
                 {
-                    found.Add(gamo);
+                    if (gamo.name.ToLower().Contains(_o.name))
+                    {
+                        found.Add(gamo);
+                    }
                 }
+
+                _o.objects = ToArray(found);
             }
-
-            trees = ToArray(found);
-
-            found = new List<GameObject>();
-            foreach (GameObject gamo in GetComponent<AssetExposer>().objectsToExpose)
-            {
-                if (gamo.name.ToLower().Contains(flowerNameForResearch))
-                {
-                    found.Add(gamo);
-                }
-            }
-
-            flower = ToArray(found);
-
-            found = new List<GameObject>();
-            foreach (GameObject gamo in GetComponent<AssetExposer>().objectsToExpose)
-            {
-                if (gamo.name.ToLower().Contains(rockNameForResearch))
-                {
-                    found.Add(gamo);
-                }
-            }
-
-            rock = ToArray(found);
-
-            found = new List<GameObject>();
-            foreach (GameObject gamo in GetComponent<AssetExposer>().objectsToExpose)
-            {
-                if (gamo.name.ToLower().Contains(stoneNameForResearch))
-                {
-                    found.Add(gamo);
-                }
-            }
-
-            stone = ToArray(found);
         }
 
         public void SearchForFloor()
@@ -231,37 +193,24 @@ namespace LevelGenerator
         {
             foreach (GameObject gamo in instantiatedFloor)
             {
-                Vector3 pos = UnityEngine.Random.insideUnitSphere * dispersionRadius;
-                pos.y = 0;
-                pos += gamo.transform.position - floorOffset + new Vector3(2.5f, 0f, 2.5f);
+                GameObject g = null;
 
-                Quaternion rot = Quaternion.Euler(0, UnityEngine.Random.Range(0f, 360f), 0);
+                foreach (ScenarioStaticObject _o in objectsToSpawn)
+                {
+                    if (UnityEngine.Random.Range(0f, 1f) <= _o.probability)
+                    {
+                        Vector3 pos = UnityEngine.Random.insideUnitSphere * _o.dispersionRadius;
+                        pos.y = 0;
+                        pos += gamo.transform.position - floorOffset + new Vector3(2.5f, 0f, 2.5f);
 
-                GameObject g;
+                        Quaternion rot = Quaternion.Euler(0, UnityEngine.Random.Range(0f, 360f), 0);
 
-                if (UnityEngine.Random.Range(0f, 1f) <= treeProb)
-                {
-                    g = Instantiate(trees[UnityEngine.Random.Range(0, trees.Length)], pos, rot, gamo.transform);
+                        g = Instantiate(_o.objects[UnityEngine.Random.Range(0, _o.objects.Length)], pos, rot, gamo.transform);
+
+                        break;
+                    }
                 }
-                else if (UnityEngine.Random.Range(0f, 1f) <= flowerProb)
-                {
-                    g = Instantiate(flower[UnityEngine.Random.Range(0, flower.Length)], pos, rot, gamo.transform);
-                }
-                else if (UnityEngine.Random.Range(0f, 1f) <= rockProb)
-                {
-                    g = Instantiate(rock[UnityEngine.Random.Range(0, rock.Length)], pos, rot, gamo.transform);
-                }
-                else if (UnityEngine.Random.Range(0f, 1f) <= stoneProb)
-                {
-                    g = Instantiate(stone[UnityEngine.Random.Range(0, stone.Length)], pos, rot, gamo.transform);
-                }
-                else if (UnityEngine.Random.Range(0f, 1f) <= otherProb)
-                {
-                    g = Instantiate(otherScenariosObject[UnityEngine.Random.Range(0, otherScenariosObject.Length)], pos, rot, gamo.transform);
-                }
-                else
-                    g = null;
-                    
+
                 if (g != null)
                     if (g.GetComponent<Collider>() == null)
                         g.AddComponent<BoxCollider>();
@@ -289,30 +238,6 @@ namespace LevelGenerator
             }
 
             return _array;
-        }
-
-        void OnValidate()
-        {
-            if (treeProb > 1)
-            {
-                treeProb = 1;
-            }
-            if (flowerProb > 1)
-            {
-                flowerProb = 1;
-            }
-            if (rockProb > 1)
-            {
-                rockProb = 1;
-            }
-            if (stoneProb > 1)
-            {
-                stoneProb = 1;
-            }
-            if (otherProb > 1)
-            {
-                otherProb = 1;
-            }
         }
     }
 
