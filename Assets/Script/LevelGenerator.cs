@@ -183,9 +183,12 @@ namespace LevelGenerator
             GameObject floor = GameObject.Find("Floor");
             MeshRenderer[] floors = floor.GetComponentsInChildren<MeshRenderer>();
 
+            instantiatedFloor.Clear();
+
             foreach (MeshRenderer _m in floors)
             {
-                instantiatedFloor.Add(_m.gameObject);
+                if (_m.gameObject.transform.parent.gameObject == floor)
+                    instantiatedFloor.Add(_m.gameObject);
             }
         }
 
@@ -216,7 +219,7 @@ namespace LevelGenerator
                         g.AddComponent<BoxCollider>();
             }
         }
-
+        
         private List<GameObject> ToList(GameObject[] _array)
         {
             List<GameObject> list = new List<GameObject>();
